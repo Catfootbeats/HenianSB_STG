@@ -1,0 +1,6 @@
+.idea
+.vscode
+dev_src
+ty.spec
+build
+dist
