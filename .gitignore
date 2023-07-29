@@ -4,6 +4,6 @@ dev_src
 ty.spec
 build
 dist
-Pipfile
-Pipfile.lock
+./Pipfile
+./Pipfile.lock
 __pycache__ 

@@ -65,7 +65,7 @@ class Enemy(Sprite):
         # print(player_x, player_y)
         if self.fire_delay_sign == 0:
             bullet_move_direction = self._get_player_direction(player_x, player_y)
-            print(bullet_move_direction)
+            print('Position:', '(', self.x, ',', self.y, ')', ':', bullet_move_direction)
             bullet = EnemyBullet(self.screen, self.settings, bullet_move_direction, self)
             self.game.enemy_bullets.add(bullet)
             self.fire_delay_sign += 1
@@ -76,9 +76,24 @@ class Enemy(Sprite):
 
     def _get_player_direction(self, player_x: int, player_y: int) -> float:
         # Get player's position and transform into direction.
-        x: float = player_x - self.x
-        y: float = player_y - self.y
-        return math.radians(math.asin(x / math.sqrt(x * x + y * y)))
+        x: float = player_x - self.rect.centerx
+        y: float = player_y - self.rect.centery
+        if x >= 0:
+            print('x >= 0')
+            if y >= 0:
+                print('y >= 0')
+                return 90 - math.degrees(math.asin(x / math.sqrt(x * x + y * y)))
+            if y < 0:
+                print('y < 0')
+                return math.degrees(math.asin(x / math.sqrt(x * x + y * y))) - 90
+        elif x < 0:
+            print('x < 0')
+            if y >= 0:
+                print('y >= 0')
+                return 90 - math.degrees(math.asin(x / math.sqrt(x * x + y * y)))
+            elif y < 0:
+                print('y < 0')
+                return math.degrees(math.asin(x / math.sqrt(x * x + y * y))) - 90
 
     def _draw_enemy(self):
         self.screen.blit(self.image, self.rect)
