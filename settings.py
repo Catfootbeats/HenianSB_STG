@@ -20,6 +20,9 @@ class Settings:
         self.self_bullet_width = 10
         self.self_bullet_height = 10
 
+        self.enemy_bullet_speed = 10
+        self.enemy_bullet_delay = 100
+
         # Enemy Settings
         self.enemy_health = 1
         self.boss_health = 10

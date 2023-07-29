@@ -4,3 +4,5 @@ dev_src
 ty.spec
 build
 dist
+Pipfile
+Pipfile.lock

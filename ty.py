@@ -1,3 +1,4 @@
+import os.path
 import sys
 import pygame
 
@@ -6,6 +7,8 @@ from ship import Ship
 from enemy import Enemy
 # from self_bullet import SelfBullet
 
+ICO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tysm.ico')
+
 
 class TY:
     def __init__(self):
@@ -13,7 +16,7 @@ class TY:
         self.settings = Settings()
         self.boss_count = self.settings.boss_count
 
-        pygame.display.set_icon(pygame.image.load("images/tysm.ico"))
+        pygame.display.set_icon(pygame.image.load(ICO_PATH))
         if self.settings.is_full_screen:
             self.screen = pygame.display.set_mode((self.settings.screen_width,
                                                    self.settings.screen_height),
@@ -24,6 +27,7 @@ class TY:
 
         self.ship = Ship(self)
         self.self_bullets = pygame.sprite.Group()
+        self.enemy_bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.clock = pygame.time.Clock()
 
@@ -36,15 +40,7 @@ class TY:
             else:
                 pass
             # TODO present FPS
-
-            self._check_events()
-            self.ship.update()
-            self.enemies.update()
-            self.self_bullets.update()
-            if len(self.enemies.sprites()) == 0 and self.boss_count > 0:
-                self._create_boss()
-                self.boss_count -= 1
-            print(len(self.enemies.sprites()))
+            self._update_logic()
             self._update_screen()
 
     def _check_events(self):
@@ -89,11 +85,23 @@ class TY:
         if event.key == pygame.K_z:
             self.ship.is_fire = False
 
+    def _update_logic(self):
+        self._check_events()
+        self.ship.update()
+        self.enemies.update()
+        self.enemy_bullets.update()
+        self._update_enemy()
+        self.self_bullets.update()
+        if len(self.enemies.sprites()) == 0 and self.boss_count > 0:
+            self._create_boss()
+            self.boss_count -= 1
+        # print(len(self.enemies.sprites()))
+
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
-        self._draw_enemy()
         self._update_bullets()
+        self._draw_enemy()
         pygame.display.flip()
 
     def _create_enemies(self):
@@ -117,6 +125,10 @@ class TY:
                         True)
         self.enemies.add(enemy_2)
 
+    def _update_enemy(self):
+        for enemy in self.enemies.sprites():
+            enemy.enemy_update(self.ship.rect.centerx, self.ship.rect.centery)
+
     def _draw_enemy(self):
         for enemy in self.enemies.sprites():
             enemy.draw_enemy()
@@ -135,12 +147,14 @@ class TY:
         # print(collisions.values())
         for item in collisions.values():
             for enemy in item:
-                print(enemy.health)
+                # print(enemy.health)
                 if enemy.hurt():
                     self.enemies.remove(enemy)
 
     def _draw_bullets(self):
         for bullet in self.self_bullets.sprites():
+            bullet.draw_self_bullet()
+        for bullet in self.enemy_bullets.sprites():
             bullet.draw_self_bullet()
 
     def _clear_bullets(self):
@@ -148,6 +162,9 @@ class TY:
             if bullet.rect.bottom <= 0:
                 self.self_bullets.remove(bullet)
             # print(len(self.self_bullets))
+        for bullet in self.enemy_bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.enemy_bullets.remove(bullet)
 
 
 if __name__ == '__main__':

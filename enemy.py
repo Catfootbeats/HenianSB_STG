@@ -1,6 +1,13 @@
+import math
+import os
 import pygame
 from pygame.sprite import Sprite
+
+from enemy_bullet import EnemyBullet
+
 # import ty
+
+ENEMY_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/v.png')
 
 
 class Enemy(Sprite):
@@ -11,7 +18,9 @@ class Enemy(Sprite):
         if is_boss:
             self.health = ty_game.settings.boss_health
         self.screen = ty_game.screen
-        self.image = pygame.image.load('images/v (Custom).png')
+        self.settings = ty_game.settings
+        self.game = ty_game
+        self.image = pygame.image.load(ENEMY_IMAGE_PATH)
         self.rect = self.image.get_rect()
 
         self.is_in_position = False
@@ -28,6 +37,9 @@ class Enemy(Sprite):
         self.y = float(self.rect.y)
 
         self.enter_speed = enter_speed
+        # Fire
+        self.fire_delay_sign = 0
+        self.fire_delay = self.settings.enemy_bullet_delay
 
     def draw_enemy(self):
         if not self.is_in_position:
@@ -44,6 +56,29 @@ class Enemy(Sprite):
     # TODO Fall into player
     def run(self):
         pass
+
+    def enemy_update(self, player_x: int, player_y: int):
+        self._fire(player_x, player_y)
+
+    # Trace bullets
+    def _fire(self, player_x: int, player_y: int):
+        # print(player_x, player_y)
+        if self.fire_delay_sign == 0:
+            bullet_move_direction = self._get_player_direction(player_x, player_y)
+            print(bullet_move_direction)
+            bullet = EnemyBullet(self.screen, self.settings, bullet_move_direction, self)
+            self.game.enemy_bullets.add(bullet)
+            self.fire_delay_sign += 1
+        elif self.fire_delay_sign == self.fire_delay:
+            self.fire_delay_sign = 0
+        else:
+            self.fire_delay_sign += 1
+
+    def _get_player_direction(self, player_x: int, player_y: int) -> float:
+        # Get player's position and transform into direction.
+        x: float = player_x - self.x
+        y: float = player_y - self.y
+        return math.radians(math.asin(x / math.sqrt(x * x + y * y)))
 
     def _draw_enemy(self):
         self.screen.blit(self.image, self.rect)

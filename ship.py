@@ -1,6 +1,10 @@
+import os.path
 import pygame
 from collide_body import CircleCollideBody
 from self_bullet import SelfBullet
+
+SHIP_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tianyi.png')
+SHIP_WITH_POINT_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tianyi_with_point.png')
 
 
 class Ship:
@@ -13,7 +17,7 @@ class Ship:
 
         # Get surface
         # TODO exchange image
-        self.image = pygame.image.load('images/tianyi (Custom).png')
+        self.image = pygame.image.load(SHIP_IMAGE_PATH)
         self.rect = self.image.get_rect()
 
         # Set init position
@@ -41,11 +45,11 @@ class Ship:
         if self.shift:
             self.act_speed = self.settings.ship_low_speed
             # TODO exchange image
-            self.image = pygame.image.load('images/tianyi_with_point.png')
+            self.image = pygame.image.load(SHIP_WITH_POINT_IMAGE_PATH)
         else:
             self.act_speed = self.settings.ship_speed
             # TODO exchange image
-            self.image = pygame.image.load('images/tianyi (Custom).png')
+            self.image = pygame.image.load(SHIP_IMAGE_PATH)
 
         self._fire()
         self._move()

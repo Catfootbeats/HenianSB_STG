@@ -1,6 +1,9 @@
+import os
 import pygame
 from pygame.sprite import Sprite
 # from random import choice
+
+BULLET_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/bullet.png')
 
 
 class SelfBullet(Sprite):
