@@ -7,12 +7,14 @@ SHIP_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'imag
 SHIP_WITH_POINT_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tianyi_with_point.png')
 
 
-class Ship:
+class Ship(pygame.sprite.Sprite):
 
     def __init__(self, ty_game):
+        super().__init__()
         self.game = ty_game
         self.screen = ty_game.screen
         self.settings = ty_game.settings
+        self.radius = self.settings.ship_hitbox_r
         self.screen_rect = ty_game.screen.get_rect()
 
         # Get surface
@@ -24,7 +26,7 @@ class Ship:
         self.rect.midbottom = self.screen_rect.midbottom
 
         # Collide body
-        self.collide_body = CircleCollideBody(self.settings.ship_hitbox_r)
+        self.collide_body = CircleCollideBody(self.radius)
 
         self.x = float(self.rect.x)
         self.y = float(self.rect.y)

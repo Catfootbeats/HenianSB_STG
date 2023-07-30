@@ -2,12 +2,16 @@ import os.path
 import sys
 import pygame
 
+import tools
 from settings import Settings
 from ship import Ship
 from enemy import Enemy
 # from self_bullet import SelfBullet
 
 ICO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tysm.ico')
+GAME_STATE_MENU = 0
+GAME_STATE_GAMING = 1
+GAME_STATE_GAME_OVER = 2
 
 
 class TY:
@@ -25,13 +29,14 @@ class TY:
             self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("天依嘿嘿嘿🤤 警告:图片仅为临时图片,并无版权,且判定点位置偏移 按ESC退出")
 
-        self.ship = Ship(self)
-        self.self_bullets = pygame.sprite.Group()
-        self.enemy_bullets = pygame.sprite.Group()
-        self.enemies = pygame.sprite.Group()
+        self.ship = None
+        self.self_bullets = None
+        self.enemy_bullets = None
+        self.enemies = None
         self.clock = pygame.time.Clock()
 
-        self._create_enemies()
+        self.game_state = GAME_STATE_GAMING
+        self._init_game()
 
     def run_game(self):
         while True:
@@ -40,8 +45,21 @@ class TY:
             else:
                 pass
             # TODO present FPS
-            self._update_logic()
-            self._update_screen()
+            if self.game_state == GAME_STATE_MENU:
+                tools.debug('Menu')
+            if self.game_state == GAME_STATE_GAMING:
+                tools.debug('Gaming')
+                self._update_logic()
+                self._update_screen()
+            if self.game_state == GAME_STATE_GAME_OVER:
+                tools.debug('Game Over!')
+
+    def _init_game(self):
+        self.ship = Ship(self)
+        self.self_bullets = pygame.sprite.Group()
+        self.enemy_bullets = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
+        self._create_enemies()
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -95,7 +113,7 @@ class TY:
         if len(self.enemies.sprites()) == 0 and self.boss_count > 0:
             self._create_boss()
             self.boss_count -= 1
-        # print(len(self.enemies.sprites()))
+        # debug.debug(len(self.enemies.sprites()))
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
@@ -128,6 +146,15 @@ class TY:
     def _update_enemy(self):
         for enemy in self.enemies.sprites():
             enemy.enemy_update(self.ship.rect.centerx, self.ship.rect.centery)
+        if pygame.sprite.spritecollide(self.ship,
+                                       self.enemies,
+                                       False,
+                                       pygame.sprite.collide_circle) or pygame.sprite.spritecollide(self.ship,
+                                                                                                    self.enemy_bullets,
+                                                                                                    False,
+                                                                                                    pygame.sprite.collide_circle):
+            tools.debug('GAME OVER!!!')
+            # self.game_state = GAME_STATE_GAME_OVER
 
     def _draw_enemy(self):
         for enemy in self.enemies.sprites():
@@ -143,11 +170,11 @@ class TY:
                                                 self.enemies,
                                                 True,
                                                 False)
-        # print('Collisions')
-        # print(collisions.values())
+        # debug.debug('Collisions')
+        # debug.debug(collisions.values())
         for item in collisions.values():
             for enemy in item:
-                # print(enemy.health)
+                # debug.debug(enemy.health)
                 if enemy.hurt():
                     self.enemies.remove(enemy)
 
@@ -161,7 +188,7 @@ class TY:
         for bullet in self.self_bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.self_bullets.remove(bullet)
-            # print(len(self.self_bullets))
+            # debug.debug(len(self.self_bullets))
         for bullet in self.enemy_bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.enemy_bullets.remove(bullet)
