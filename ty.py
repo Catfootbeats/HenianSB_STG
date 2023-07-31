@@ -2,7 +2,10 @@ import os.path
 import sys
 import pygame
 
+import menu_scene
 import tools
+from game_over_scene import GameOver
+from menu_scene import Menu
 from settings import Settings
 from ship import Ship
 from enemy import Enemy
@@ -35,24 +38,34 @@ class TY:
         self.enemies = None
         self.clock = pygame.time.Clock()
 
-        self.game_state = GAME_STATE_GAMING
-        self._init_game()
+        self.game_state = GAME_STATE_MENU
+        self.menu = Menu(self)
+        self.game_over = GameOver(self)
+        self.menu_sign = False
+
+        self.game_is_init = False
+        self.menu_is_init = False
 
     def run_game(self):
         while True:
             if self.settings.FPS != 0:
                 self.clock.tick(self.settings.FPS)
-            else:
-                pass
-            # TODO present FPS
             if self.game_state == GAME_STATE_MENU:
-                tools.debug('Menu')
+                # tools.debug('Menu')
+                self.menu_update()
+                self.menu.draw()
             if self.game_state == GAME_STATE_GAMING:
                 tools.debug('Gaming')
+                if not self.game_is_init:
+                    self._init_game()
+                    self.game_is_init = True
                 self._update_logic()
                 self._update_screen()
             if self.game_state == GAME_STATE_GAME_OVER:
                 tools.debug('Game Over!')
+                self.game_over_update()
+                self.game_over.draw()
+            pygame.display.flip()
 
     def _init_game(self):
         self.ship = Ship(self)
@@ -60,6 +73,43 @@ class TY:
         self.enemy_bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self._create_enemies()
+
+    def game_over_update(self):
+        self._check_events_over()
+
+    def _check_events_over(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if self.game_over.replay_button.rect.collidepoint(mouse_pos):
+                    self.game_state = GAME_STATE_GAMING
+                if self.game_over.back_menu_button.rect.collidepoint(mouse_pos):
+                    self.game_state = GAME_STATE_MENU
+
+
+    def menu_update(self):
+        self._check_events_menu()
+
+    def _check_events_menu(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                tools.debug(self.menu_sign)
+                if self.menu.state != menu_scene.MENU_STATE_NORMAL and self.menu_sign:
+                    self.menu.state = menu_scene.MENU_STATE_NORMAL
+                    self.menu_sign = False
+                if self.menu.play_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    self.game_state = GAME_STATE_GAMING
+                if self.menu.help_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    self.menu.state = menu_scene.MENU_STATE_HELP
+                    self.menu_sign = True
+                if self.menu.about_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    self.menu.state = menu_scene.MENU_STATE_ABOUT
+                    self.menu_sign = True
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -120,7 +170,6 @@ class TY:
         self.ship.blitme()
         self._update_bullets()
         self._draw_enemy()
-        pygame.display.flip()
 
     def _create_enemies(self):
         enemy_0 = Enemy(self,
@@ -154,7 +203,8 @@ class TY:
                                                                                                     False,
                                                                                                     pygame.sprite.collide_circle):
             tools.debug('GAME OVER!!!')
-            # self.game_state = GAME_STATE_GAME_OVER
+            self.game_state = GAME_STATE_GAME_OVER
+            self.game_is_init = False
 
     def _draw_enemy(self):
         for enemy in self.enemies.sprites():
