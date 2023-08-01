@@ -1,4 +1,4 @@
-from button import Button
+from text import Text
 
 MENU_STATE_NORMAL = 0
 MENU_STATE_HELP = 1
@@ -14,29 +14,32 @@ class Menu:
         self.state = MENU_STATE_NORMAL
         self.screen = ty_game.screen
 
-        self.title_text = Button(ty_game,
-                                 '暴打老V',
-                                 320,
-                                 242,
-                                 60,
-                                 None,
-                                 '#66CCFF')
+        self.title_text = Text(ty_game,
+                               '暴打老V',
+                               320,
+                               242,
+                               60,
+                               None,
+                               '#66CCFF')
 
-        self.play_button = Button(ty_game, '开始', 320, 342)
+        self.play_button = Text(ty_game, '开始', 320, 342)
         self.normal_elements.append(self.play_button)
-        self.help_button = Button(ty_game, '帮助', 320, 442)
+        self.help_button = Text(ty_game, '帮助', 320, 442)
         self.normal_elements.append(self.help_button)
-        self.about_button = Button(ty_game, '关于', 320, 542)
+        self.about_button = Text(ty_game, '关于', 320, 542)
         self.normal_elements.append(self.about_button)
 
-        self.help_text_0 = Button(ty_game, '按方向键移动', 320, 342)
+        self.help_text_0 = Text(ty_game, '按方向键移动', 320, 342)
         self.help_elements.append(self.help_text_0)
-        self.help_text_1 = Button(ty_game, '按 Z 射击', 320, 442)
+        self.help_text_1 = Text(ty_game, '按 Z 射击', 320, 442)
         self.help_elements.append(self.help_text_1)
-        self.help_text_2 = Button(ty_game, '按 Shift 减速', 320, 542)
+        self.help_text_2 = Text(ty_game, '按 Shift 减速', 320, 542)
         self.help_elements.append(self.help_text_2)
+        self.help_text_3 = Text(ty_game, '按 P 暂停', 320, 642)
+        self.help_elements.append(self.help_text_3)
 
-        self.about_text_0 = Button(ty_game, '前面的区域，以后再来探索吧！', 320, 342, background_color=None, text_color='#66CCFF')
+        self.about_text_0 = Text(ty_game, '前面的区域，以后再来探索吧！', 320, 342, background_color=None,
+                                 text_color='#66CCFF')
         self.about_elements.append(self.about_text_0)
 
     def draw(self):

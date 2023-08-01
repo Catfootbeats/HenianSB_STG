@@ -3,12 +3,14 @@ import sys
 import pygame
 
 import menu_scene
+import text
 import tools
 from game_over_scene import GameOver
 from menu_scene import Menu
 from settings import Settings
 from ship import Ship
 from enemy import Enemy
+
 # from self_bullet import SelfBullet
 
 ICO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tysm.ico')
@@ -36,15 +38,16 @@ class TY:
         self.self_bullets = None
         self.enemy_bullets = None
         self.enemies = None
+        self.pause_text = None
         self.clock = pygame.time.Clock()
 
         self.game_state = GAME_STATE_MENU
         self.menu = Menu(self)
         self.game_over = GameOver(self)
-        self.menu_sign = False
 
         self.game_is_init = False
-        self.menu_is_init = False
+        self.game_is_pause = False
+        self.pause_sign = 0
 
     def run_game(self):
         while True:
@@ -55,14 +58,18 @@ class TY:
                 self.menu_update()
                 self.menu.draw()
             if self.game_state == GAME_STATE_GAMING:
-                tools.debug('Gaming')
+                # tools.debug('Gaming')
                 if not self.game_is_init:
                     self._init_game()
                     self.game_is_init = True
-                self._update_logic()
-                self._update_screen()
+                if not self.game_is_pause:
+                    self._update_logic()
+                    self._update_screen()
+                else:
+                    self._update_screen()
+                    self.pause_update()
             if self.game_state == GAME_STATE_GAME_OVER:
-                tools.debug('Game Over!')
+                # tools.debug('Game Over!')
                 self.game_over_update()
                 self.game_over.draw()
             pygame.display.flip()
@@ -73,6 +80,27 @@ class TY:
         self.enemy_bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self._create_enemies()
+        self.pause_text = text.Text(self,
+                                    '暂停',
+                                    640,
+                                    384,
+                                    60,
+                                    None,
+                                    '#FFFFFF')
+
+    def pause_update(self):
+        self.pause_text.draw_element()
+        if self.pause_sign != 0:
+            self.pause_sign -= 1
+        elif self.pause_sign == 0:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        sys.exit()
+                    if event.key == pygame.K_p:
+                        self.game_is_pause = False
 
     def game_over_update(self):
         self._check_events_over()
@@ -81,6 +109,9 @@ class TY:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.game_over.replay_button.rect.collidepoint(mouse_pos):
@@ -88,28 +119,36 @@ class TY:
                 if self.game_over.back_menu_button.rect.collidepoint(mouse_pos):
                     self.game_state = GAME_STATE_MENU
 
-
     def menu_update(self):
         self._check_events_menu()
 
     def _check_events_menu(self):
+        menu_sign = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                menu_sign += 1
                 mouse_pos = pygame.mouse.get_pos()
-                tools.debug(self.menu_sign)
-                if self.menu.state != menu_scene.MENU_STATE_NORMAL and self.menu_sign:
-                    self.menu.state = menu_scene.MENU_STATE_NORMAL
-                    self.menu_sign = False
-                if self.menu.play_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                # tools.debug(menu_sign)
+                if self.menu.play_button.rect.collidepoint(
+                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
                     self.game_state = GAME_STATE_GAMING
-                if self.menu.help_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                if self.menu.help_button.rect.collidepoint(
+                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    # print(self.menu.state)
                     self.menu.state = menu_scene.MENU_STATE_HELP
-                    self.menu_sign = True
-                if self.menu.about_button.rect.collidepoint(mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    menu_sign = 2
+                if self.menu.about_button.rect.collidepoint(
+                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
                     self.menu.state = menu_scene.MENU_STATE_ABOUT
-                    self.menu_sign = True
+                    menu_sign = 2
+                if self.menu.state != menu_scene.MENU_STATE_NORMAL and menu_sign == 1:
+                    self.menu.state = menu_scene.MENU_STATE_NORMAL
+                    self.menu_sign = 0
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -137,6 +176,9 @@ class TY:
 
         if event.key == pygame.K_z:
             self.ship.is_fire = True
+        if event.key == pygame.K_p:
+            self.game_is_pause = True
+            self.pause_sign = 10
 
     def _check_keyup_events(self, event: pygame.event):
         if event.key == pygame.K_RIGHT:
@@ -186,7 +228,7 @@ class TY:
 
     def _create_boss(self):
         enemy_2 = Enemy(self,
-                        self.settings.screen_width/2,
+                        self.settings.screen_width / 2,
                         self.settings.screen_height / 5,
                         1,
                         True)

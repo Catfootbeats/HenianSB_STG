@@ -1,7 +1,7 @@
 import pygame.font
 
 
-class Button:
+class Text:
     def __init__(self,
                  ty_game,
                  msg: str,
@@ -11,14 +11,15 @@ class Button:
                  background_color='#66CCFF',
                  text_color='#FFFFFF',
                  width=200,
-                 height=50):
+                 height=50,
+                 font='simhei'):
         self.screen = ty_game.screen
         self.screen_rect = ty_game.screen.get_rect()
 
         self.width, self.height = width, height
         self.button_color = background_color
         self.text_color = text_color
-        self.font = pygame.font.SysFont("simhei", size)
+        self.font = pygame.font.SysFont(font, size)
 
         self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.rect.centerx = x

@@ -1,4 +1,4 @@
-from button import Button
+from text import Text
 
 
 class GameOver:
@@ -7,17 +7,18 @@ class GameOver:
 
         self.screen = ty_game.screen
 
-        self.game_over_text = Button(ty_game,
-                                     'Game Over',
-                                     320,
-                                     242,
-                                     60,
-                                     None,
-                                     '#EE0000')
+        self.game_over_text = Text(ty_game,
+                                   'Game Over',
+                                   320,
+                                   242,
+                                   60,
+                                   None,
+                                   '#EE0000',
+                                   font='Blackadder ITC')
         self.elements.append(self.game_over_text)
-        self.replay_button = Button(ty_game, '重新开始', 320, 342)
+        self.replay_button = Text(ty_game, '重新开始', 320, 342)
         self.elements.append(self.replay_button)
-        self.back_menu_button = Button(ty_game, '返回标题', 320, 442)
+        self.back_menu_button = Text(ty_game, '返回标题', 320, 442)
         self.elements.append(self.back_menu_button)
 
     def draw(self):

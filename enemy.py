@@ -43,8 +43,6 @@ class Enemy(Sprite):
         self.fire_delay = self.settings.enemy_bullet_delay
 
     def draw_enemy(self):
-        if not self.is_in_position:
-            self._enter()
         self._draw_enemy()
 
     def hurt(self) -> bool:
@@ -59,6 +57,8 @@ class Enemy(Sprite):
         pass
 
     def enemy_update(self, player_x: int, player_y: int):
+        if not self.is_in_position:
+            self._enter()
         self._fire(player_x, player_y)
 
     # Trace bullets
