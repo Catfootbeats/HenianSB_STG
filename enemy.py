@@ -13,11 +13,13 @@ ENEMY_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ima
 
 class Enemy(Sprite):
 
-    def __init__(self, ty_game, x: int, y: int, enter_speed: int = 0, is_boss: bool = False):
+    def __init__(self, ty_game, x: int, y: int, enter_speed: int = 3, is_boss: bool = False):
         super().__init__()
         self.health = ty_game.settings.enemy_health
         self.fire_delay = ty_game.settings.enemy_bullet_delay
+        self.xiao_long_bao = ty_game.settings.enemy_xlb
         if is_boss:
+            self.xiao_long_bao = ty_game.settings.boss_xlb
             self.health = ty_game.settings.boss_health
             self.fire_delay = ty_game.settings.boss_bullet_delay
         self.screen = ty_game.screen
@@ -68,7 +70,7 @@ class Enemy(Sprite):
             angle = 0
             while angle < 360:
                 self._fire_angle(angle + self.fire_angle)
-                angle += 20
+                angle += 25
             self.fire_angle += 10
             if self.fire_angle == 360:
                 self.fire_angle = 0

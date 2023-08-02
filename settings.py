@@ -6,7 +6,7 @@ class Settings:
         self.screen_height = 768
         self.bg_color = '#66ccff'
         self.is_full_screen = False
-        self.FPS = 60
+        self.FPS = 90
         # If FPS = 0, no limitation
 
         # Ship Settings
@@ -22,10 +22,18 @@ class Settings:
 
         self.enemy_bullet_speed = 10
         self.enemy_bullet_delay = 1
+        self.enemy_xlb = 1000
+        # 为什么干掉小兵获得的小笼包比BOSS还多？
 
-        self.boss_bullet_delay = 5
+        self.create_enemy_delay = 100
+        self.create_sleep = 500
+        self.create_max = 10
+        self.screen_enemy_max = 10
+
+        self.boss_bullet_delay = 100
+        self.boss_xlb = 100
 
         # Enemy Settings
-        self.enemy_health = 15
-        self.boss_health = 1000
-        self.boss_count = 1
+        self.enemy_health = 1
+        self.boss_health = 1
+        self.enemy_count = 2

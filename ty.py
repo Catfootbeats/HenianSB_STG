@@ -1,4 +1,5 @@
 import os.path
+import random
 import sys
 import pygame
 
@@ -23,7 +24,6 @@ class TY:
     def __init__(self):
         pygame.init()
         self.settings = Settings()
-        self.boss_count = self.settings.boss_count
 
         pygame.display.set_icon(pygame.image.load(ICO_PATH))
         if self.settings.is_full_screen:
@@ -48,6 +48,12 @@ class TY:
         self.game_is_init = False
         self.game_is_pause = False
         self.pause_sign = 0
+
+        self.xiao_long_bao = 0
+
+        self.create_enemy_count = 0
+        self.create_sleep_sign = -1
+        self.create_delay_sign = self.settings.create_enemy_delay
 
     def run_game(self):
         while True:
@@ -75,11 +81,11 @@ class TY:
             pygame.display.flip()
 
     def _init_game(self):
+        self.xiao_long_bao = 0
         self.ship = Ship(self)
         self.self_bullets = pygame.sprite.Group()
         self.enemy_bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
-        self._create_enemies()
         self.pause_text = text.Text(self,
                                     '暂停',
                                     640,
@@ -197,14 +203,12 @@ class TY:
 
     def _update_logic(self):
         self._check_events()
+        self._create_enemies()
         self.ship.update()
         self.enemies.update()
         self.enemy_bullets.update()
         self._update_enemy()
         self.self_bullets.update()
-        if len(self.enemies.sprites()) == 0 and self.boss_count > 0:
-            self._create_boss()
-            self.boss_count -= 1
         # debug.debug(len(self.enemies.sprites()))
 
     def _update_screen(self):
@@ -214,25 +218,69 @@ class TY:
         self._draw_enemy()
 
     def _create_enemies(self):
-        enemy_0 = Enemy(self,
-                        self.settings.screen_width / 7,
-                        self.settings.screen_height / 5,
-                        1)
-        self.enemies.add(enemy_0)
+        self.create_delay_sign += 1
+        # Sleep create
+        # -1 不休息
+        # 大于0小于create_sleep休息
+        if self.create_sleep_sign >= self.settings.create_sleep:
+            self.create_enemy_count = 0
+            self.create_sleep_sign = -1
+        elif self.create_sleep_sign >= 0:
+            self.create_sleep_sign += 1
 
-        enemy_1 = Enemy(self,
-                        self.settings.screen_width - self.settings.screen_width / 5,
-                        self.settings.screen_height / 5,
-                        1)
-        self.enemies.add(enemy_1)
+        if self.create_enemy_count > self.settings.create_max:
+            self.create_enemy_count = 0
+            self.create_sleep_sign = 0
 
-    def _create_boss(self):
-        enemy_2 = Enemy(self,
-                        self.settings.screen_width / 2,
-                        self.settings.screen_height / 5,
-                        1,
-                        True)
-        self.enemies.add(enemy_2)
+        # 不休息 and 未超过创建极限 and 未超过同屏极限 and 创建延迟
+        if (self.create_sleep_sign == -1
+                and self.create_enemy_count <= self.settings.create_max
+                and len(self.enemies.sprites()) < self.settings.screen_enemy_max
+                and self.create_delay_sign >= self.settings.create_enemy_delay):
+            self.create_enemy_count += 1
+            self.create_delay_sign = 0
+            boss = Enemy(self,
+                         random.randint(int(100),
+                                        int(self.settings.screen_width - 100)),
+                         random.randint(int(100),
+                                        int(self.settings.screen_height / 2)),
+                         1,
+                         True)
+            self.enemies.add(boss)
+            if self.create_enemy_count % 4 == 0:
+                enemy_0 = Enemy(self,
+                                random.randint(int(25),
+                                               int(self.settings.screen_width - 25)),
+                                random.randint(int(25),
+                                               int(self.settings.screen_height / 2)))
+                self.enemies.add(enemy_0)
+                enemy_1 = Enemy(self,
+                                random.randint(int(25),
+                                               int(self.settings.screen_width - 25)),
+                                random.randint(int(25),
+                                               int(self.settings.screen_height / 2)))
+                self.enemies.add(enemy_1)
+        """ 另一种玩法
+        enemy_times = 2
+        if len(self.enemies.sprites()) == 0 and self.create_enemy_count < enemy_times:
+            self.create_enemy_count += 1
+            while len(self.enemies.sprites()) < self.settings.enemy_count:
+                enemy = Enemy(self,
+                              random.randint(int(25),
+                                             int(self.settings.screen_width - 25)),
+                              random.randint(int(25),
+                                             int(self.settings.screen_height / 2)))
+                self.enemies.add(enemy)
+        if self.create_enemy_count == enemy_times:
+            boss = Enemy(self,
+                         random.randint(int(100),
+                                        int(self.settings.screen_width - 100)),
+                         random.randint(int(100),
+                                        int(self.settings.screen_height / 2)),
+                         1,
+                         True)
+            self.enemies.add(boss)
+        """
 
     def _update_enemy(self):
         for enemy in self.enemies.sprites():
@@ -246,6 +294,7 @@ class TY:
                                                                                                     pygame.sprite.collide_circle):
             tools.debug('GAME OVER!!!')
             self.game_state = GAME_STATE_GAME_OVER
+            self.create_enemy_count = 0
             self.game_is_init = False
 
     def _draw_enemy(self):
@@ -268,6 +317,8 @@ class TY:
             for enemy in item:
                 # debug.debug(enemy.health)
                 if enemy.hurt():
+                    self.xiao_long_bao += enemy.xiao_long_bao
+                    tools.debug(self.xiao_long_bao)
                     self.enemies.remove(enemy)
 
     def _draw_bullets(self):

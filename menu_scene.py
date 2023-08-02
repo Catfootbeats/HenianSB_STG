@@ -38,9 +38,21 @@ class Menu:
         self.help_text_3 = Text(ty_game, '按 P 暂停', 320, 642)
         self.help_elements.append(self.help_text_3)
 
-        self.about_text_0 = Text(ty_game, '前面的区域，以后再来探索吧！', 320, 342, background_color=None,
+        self.about_text_0 = Text(ty_game, '制作：Catfootbeats（某某）', 320, 542, background_color=None,
                                  text_color='#66CCFF')
         self.about_elements.append(self.about_text_0)
+        self.about_text_1 = Text(ty_game, '试玩版，图片并无版权！！！', 320, 342, background_color=None,
+                                 text_color='#EE0000')
+        self.about_elements.append(self.about_text_1)
+        self.about_text_2 = Text(ty_game, '仅供娱乐，切勿当真！', 320, 442, background_color=None,
+                                 text_color='#EE0000')
+        self.about_elements.append(self.about_text_2)
+        # self.about_text_3 = Text(ty_game, 'GitHub', 260, 642, background_color=None,
+        #                          text_color='#66CCFF')
+        # self.about_elements.append(self.about_text_3)
+        # self.about_text_4 = Text(ty_game, 'Bilibili', 370, 642, background_color=None,
+        #                          text_color='#66CCFF')
+        # self.about_elements.append(self.about_text_4)
 
     def draw(self):
         self.screen.fill('#FFFFFF')
