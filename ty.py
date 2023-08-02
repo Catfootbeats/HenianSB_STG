@@ -2,6 +2,7 @@ import os.path
 import random
 import sys
 import pygame
+import webbrowser
 
 import menu_scene
 import text
@@ -11,6 +12,7 @@ from menu_scene import Menu
 from settings import Settings
 from ship import Ship
 from enemy import Enemy
+from xlb_board import XLBBoard
 
 # from self_bullet import SelfBullet
 
@@ -49,7 +51,9 @@ class TY:
         self.game_is_pause = False
         self.pause_sign = 0
 
+        # 小笼包计分
         self.xiao_long_bao = 0
+        self.xlb_board = XLBBoard(self, self.settings.screen_width - 150, 50)
 
         self.create_enemy_count = 0
         self.create_sleep_sign = -1
@@ -77,7 +81,7 @@ class TY:
             if self.game_state == GAME_STATE_GAME_OVER:
                 # tools.debug('Game Over!')
                 self.game_over_update()
-                self.game_over.draw()
+                self.game_over.draw(self.xiao_long_bao)
             pygame.display.flip()
 
     def _init_game(self):
@@ -150,6 +154,7 @@ class TY:
                     menu_sign = 2
                 if self.menu.about_button.rect.collidepoint(
                         mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                    webbrowser.open('github.com/Catfootbeats/HenianSB_STG')
                     self.menu.state = menu_scene.MENU_STATE_ABOUT
                     menu_sign = 2
                 if self.menu.state != menu_scene.MENU_STATE_NORMAL and menu_sign == 1:
@@ -216,6 +221,7 @@ class TY:
         self.ship.blitme()
         self._update_bullets()
         self._draw_enemy()
+        self.xlb_board.draw(self.xiao_long_bao)
 
     def _create_enemies(self):
         self.create_delay_sign += 1
