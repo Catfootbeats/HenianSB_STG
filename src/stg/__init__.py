@@ -1,8 +1,15 @@
 import math
+import logging
+from stg.__version__ import __version__, __resource_path__, __pyproject__
 
+logging.basicConfig(
+    format="[%(asctime)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S %z",
+    level=logging.DEBUG,
+)
 
-def debug(msg):
-    print(msg)
+def debug(msg, *args):
+    logging.debug(msg, *args)
 
 
 def get_player_direction(self, player_x: int, player_y: int) -> float:

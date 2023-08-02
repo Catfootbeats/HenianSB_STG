@@ -1,4 +1,5 @@
-from text import Text
+from stg.components.text import Text
+from stg import __version__
 
 MENU_STATE_NORMAL = 0
 MENU_STATE_HELP = 1
@@ -38,7 +39,7 @@ class Menu:
         self.help_text_3 = Text(ty_game, '按 P 暂停', 320, 642)
         self.help_elements.append(self.help_text_3)
 
-        self.about_text_0 = Text(ty_game, '制作：Catfootbeats（某某）', 320, 542, background_color=None,
+        self.about_text_0 = Text(ty_game, '制作：Catfootbeats (某某)', 320, 542, background_color=None,
                                  text_color='#66CCFF')
         self.about_elements.append(self.about_text_0)
         self.about_text_1 = Text(ty_game, '试玩版，图片并无版权！！！', 320, 342, background_color=None,
@@ -53,6 +54,9 @@ class Menu:
         # self.about_text_4 = Text(ty_game, 'Bilibili', 370, 642, background_color=None,
         #                          text_color='#66CCFF')
         # self.about_elements.append(self.about_text_4)
+        self.about_text_5 = Text(ty_game, '版本 ' + __version__, 260, 642, background_color=None,
+                                 text_color='#66CCFF')
+        self.about_elements.append(self.about_text_5)
 
     def draw(self):
         self.screen.fill('#FFFFFF')

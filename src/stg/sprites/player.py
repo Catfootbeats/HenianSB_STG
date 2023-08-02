@@ -1,13 +1,15 @@
 import os.path
 import pygame
-from collide_body import CircleCollideBody
-from self_bullet import SelfBullet
 
-SHIP_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tianyi.png')
-SHIP_WITH_POINT_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tianyi_with_point.png')
+from stg.collide_body import CircleCollideBody
+from stg.sprites.player_bullet import PlayerBullet
+from stg import __resource_path__
+
+PLAYER_IMAGE_PATH = os.path.join(__resource_path__, 'images/tianyi.png')
+PLAYER_WITH_POINT_IMAGE_PATH = os.path.join(__resource_path__, 'images/tianyi_with_point.png')
 
 
-class Ship(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):
 
     def __init__(self, ty_game):
         super().__init__()
@@ -19,7 +21,7 @@ class Ship(pygame.sprite.Sprite):
 
         # Get surface
         # TODO exchange image
-        self.image = pygame.image.load(SHIP_IMAGE_PATH)
+        self.image = pygame.image.load(PLAYER_IMAGE_PATH)
         self.rect = self.image.get_rect()
 
         # Set init position
@@ -47,11 +49,11 @@ class Ship(pygame.sprite.Sprite):
         if self.shift:
             self.act_speed = self.settings.ship_low_speed
             # TODO exchange image
-            self.image = pygame.image.load(SHIP_WITH_POINT_IMAGE_PATH)
+            self.image = pygame.image.load(PLAYER_WITH_POINT_IMAGE_PATH)
         else:
             self.act_speed = self.settings.ship_speed
             # TODO exchange image
-            self.image = pygame.image.load(SHIP_IMAGE_PATH)
+            self.image = pygame.image.load(PLAYER_IMAGE_PATH)
 
         self._fire()
         self._move()
@@ -67,7 +69,7 @@ class Ship(pygame.sprite.Sprite):
     def _fire(self):
         if self.fire_delay_sign == 0:
             if self.is_fire:
-                new_bullet = SelfBullet(self.game)
+                new_bullet = PlayerBullet(self.game)
                 self.game.self_bullets.add(new_bullet)
             self.fire_delay_sign += 1
         elif self.fire_delay_sign == self.fire_delay:

@@ -3,11 +3,10 @@ import os
 import pygame
 from pygame.sprite import Sprite
 
-from settings import Settings
+from stg.settings import Settings
+from stg import __resource_path__
 
-# from random import choice
-
-BULLET_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/bullet.png')
+BULLET_IMAGE_PATH = os.path.join(__resource_path__, 'images/bullet.png')
 
 
 class EnemyBullet(Sprite):

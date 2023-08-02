@@ -3,12 +3,12 @@ import os
 import pygame
 from pygame.sprite import Sprite
 
-import tools
-from enemy_bullet import EnemyBullet
+from stg.sprites.enemy_bullet import EnemyBullet
+from stg import get_player_direction, __resource_path__
 
 # import ty
 
-ENEMY_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/v.png')
+ENEMY_IMAGE_PATH = os.path.join(__resource_path__, 'images/v.png')
 
 
 class Enemy(Sprite):
@@ -81,7 +81,7 @@ class Enemy(Sprite):
     def _fire(self, player_x: int, player_y: int):
         # print(player_x, player_y)
         if self.fire_delay_sign == 0:
-            bullet_move_direction = tools.get_player_direction(self, player_x, player_y)
+            bullet_move_direction = get_player_direction(self, player_x, player_y)
             # print('Position:', '(', self.x, ',', self.y, ')', ':', bullet_move_direction)
             bullet = EnemyBullet(self.screen, self.settings, bullet_move_direction, self)
             self.game.enemy_bullets.add(bullet)

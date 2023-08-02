@@ -1,9 +1,10 @@
 import os
 
-from image import Image
-from text import Text
+from stg.image import Image
+from stg.components.text import Text
+from stg import __resource_path__
 
-XLB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/Xiaolongbao.jpg')
+XLB_PATH = os.path.join(__resource_path__, 'images/xiaolongbao.jpg')
 
 
 class XLBBoard:

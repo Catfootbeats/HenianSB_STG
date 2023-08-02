@@ -1,8 +1,8 @@
 import os
-
 import pygame.font
+from stg import __resource_path__ 
 
-FONT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts/SourceHanSansCN-Normal.otf')
+FONT_PATH = os.path.join(__resource_path__, 'fonts/SourceHanSansCN-Normal.otf')
 
 
 class Text:
