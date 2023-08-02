@@ -12,7 +12,7 @@ class Settings:
         # Ship Settings
         self.ship_speed = 9
         self.ship_low_speed = 3
-        self.ship_hitbox_r = 10
+        self.ship_hitbox_r = 5
 
         # Bullet Settings
         self.self_bullet_delay = 2
@@ -23,7 +23,9 @@ class Settings:
         self.enemy_bullet_speed = 10
         self.enemy_bullet_delay = 1
 
+        self.boss_bullet_delay = 5
+
         # Enemy Settings
-        self.enemy_health = 1
-        self.boss_health = 10
+        self.enemy_health = 15
+        self.boss_health = 1000
         self.boss_count = 1

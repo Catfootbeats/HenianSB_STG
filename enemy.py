@@ -16,8 +16,10 @@ class Enemy(Sprite):
     def __init__(self, ty_game, x: int, y: int, enter_speed: int = 0, is_boss: bool = False):
         super().__init__()
         self.health = ty_game.settings.enemy_health
+        self.fire_delay = ty_game.settings.enemy_bullet_delay
         if is_boss:
             self.health = ty_game.settings.boss_health
+            self.fire_delay = ty_game.settings.boss_bullet_delay
         self.screen = ty_game.screen
         self.settings = ty_game.settings
         self.game = ty_game
@@ -40,7 +42,10 @@ class Enemy(Sprite):
         self.enter_speed = enter_speed
         # Fire
         self.fire_delay_sign = 0
-        self.fire_delay = self.settings.enemy_bullet_delay
+
+        self.is_boss = is_boss
+
+        self.fire_angle = 0
 
     def draw_enemy(self):
         self._draw_enemy()
@@ -59,7 +64,16 @@ class Enemy(Sprite):
     def enemy_update(self, player_x: int, player_y: int):
         if not self.is_in_position:
             self._enter()
-        self._fire(player_x, player_y)
+        if self.is_boss:
+            angle = 0
+            while angle < 360:
+                self._fire_angle(angle + self.fire_angle)
+                angle += 20
+            self.fire_angle += 10
+            if self.fire_angle == 360:
+                self.fire_angle = 0
+        else:
+            self._fire(player_x, player_y)
 
     # Trace bullets
     def _fire(self, player_x: int, player_y: int):
@@ -68,6 +82,16 @@ class Enemy(Sprite):
             bullet_move_direction = tools.get_player_direction(self, player_x, player_y)
             # print('Position:', '(', self.x, ',', self.y, ')', ':', bullet_move_direction)
             bullet = EnemyBullet(self.screen, self.settings, bullet_move_direction, self)
+            self.game.enemy_bullets.add(bullet)
+            self.fire_delay_sign += 1
+        elif self.fire_delay_sign == self.fire_delay:
+            self.fire_delay_sign = 0
+        else:
+            self.fire_delay_sign += 1
+
+    def _fire_angle(self, direction: float):
+        if self.fire_delay_sign == 0:
+            bullet = EnemyBullet(self.screen, self.settings, direction, self)
             self.game.enemy_bullets.add(bullet)
             self.fire_delay_sign += 1
         elif self.fire_delay_sign == self.fire_delay:
