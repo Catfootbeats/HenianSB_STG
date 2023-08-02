@@ -6,6 +6,7 @@ from pygame.sprite import Sprite
 # from random import choice
 
 BULLET_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/bullet.png')
+FONT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts/NotoEmoji-Bold.ttf')
 
 
 class SelfBullet(Sprite):
@@ -17,7 +18,7 @@ class SelfBullet(Sprite):
         self.height = self.settings.self_bullet_height
         note_list = ['🎵', '🎶']
         self.note = choice(note_list)
-        self.font = pygame.font.SysFont('Segoe UI Emoji', 24)
+        self.font = pygame.font.Font(FONT_PATH, 24)
         self.bullet_image = self.font.render(self.note, True, (0, 0, 0), None)
         self.rect = self.bullet_image.get_rect()
 
