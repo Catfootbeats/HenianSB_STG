@@ -56,5 +56,3 @@ class Settings:
         self.enemy_health = 1
         # Boss血量
         self.boss_health = 1
-        # 计数，勿动
-        self.enemy_count = 2

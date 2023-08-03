@@ -1,9 +1,12 @@
 import os.path
 import random
 import sys
+from shutil import copyfile
+
 import pygame
 import webbrowser
 
+import config_loader
 import menu_scene
 import text
 import tools
@@ -25,7 +28,11 @@ GAME_STATE_GAME_OVER = 2
 class TY:
     def __init__(self):
         pygame.init()
-        self.settings = Settings()
+
+        # Load config
+        loader = config_loader.CfgLoader()
+        self.settings = loader.load()
+        tools.debug(self.settings.bg_color)
 
         pygame.display.set_icon(pygame.image.load(ICO_PATH))
         if self.settings.is_full_screen:
@@ -35,6 +42,12 @@ class TY:
         else:
             self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("天依嘿嘿嘿🤤 警告:图片仅为临时图片,并无版权,且判定点位置偏移 按ESC退出")
+
+        text.Text(self,
+                  'Loading...',
+                  self.settings.screen_width/2,
+                  self.settings.screen_height/2, background_color=None).draw_element()
+        pygame.display.flip()
 
         self.ship = None
         self.self_bullets = None
