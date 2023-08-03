@@ -3,18 +3,17 @@ import os
 import pygame
 from pygame.sprite import Sprite
 
-from settings import Settings
+from stg.config import Config
+from stg import __resource_path__
 
-# from random import choice
-
-BULLET_IMAGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/bullet.png')
+BULLET_IMAGE_PATH = os.path.join(__resource_path__, 'images/bullet.png')
 
 
 class EnemyBullet(Sprite):
-    def __init__(self, screen: pygame.surface, settings: Settings, direction: float, enemy) -> None:
+    def __init__(self, screen: pygame.surface, config: Config, direction: float, enemy) -> None:
         super().__init__()
         self.screen = screen
-        self.settings = settings
+        self.config = config
         self.image = pygame.image.load(BULLET_IMAGE_PATH)
 
         self.rect = self.image.get_rect()
@@ -31,10 +30,10 @@ class EnemyBullet(Sprite):
         self._move(direction)
 
     def _move(self, direction: float) -> None:
-        self.x += math.cos(math.radians(direction)) * self.settings.enemy_bullet_speed
-        self.y += math.sin(math.radians(direction)) * self.settings.enemy_bullet_speed
+        self.x += math.cos(math.radians(direction)) * self.config.enemy_bullet_speed
+        self.y += math.sin(math.radians(direction)) * self.config.enemy_bullet_speed
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def draw_self_bullet(self) -> None:
+    def draw_player_bullet(self) -> None:
         self.screen.blit(self.image, self.rect)
