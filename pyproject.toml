@@ -17,4 +17,4 @@ license = {text = "NON-FREE"}
 
 [tool.pdm.scripts]
 start = "python -m stg"
-build = "pyinstaller tygame.spec"
+build = "pyinstaller --noconfirm tygame.spec"

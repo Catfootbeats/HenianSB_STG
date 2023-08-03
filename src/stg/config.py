@@ -147,22 +147,45 @@ class Config:
 
 
 def load_config() -> Config:
+    import os
     import sys
     import toml
+    import platform
     from os import path
-    from stg import __is_pyinstaller__, debug, msgbox
+    from stg import __is_pyinstaller__, __is_macos_appbundle__, debug, msgbox
+    
+    class FirstTimeRunMacOSAppError(Exception):
+        pass
+
+    # 确定配置文件路径
     if __is_pyinstaller__:
         config_path = path.abspath(path.join(path.dirname(sys.executable), "config.toml"))
+        if __is_macos_appbundle__:
+            debug("Running on macOS, using config file in parent directory.")
+            config_path = path.abspath(path.join(
+                os.getenv("HOME"),
+                "Library/Preferences/dev.luotianyi.pygame.beating-agent-v/config.toml"
+            ))
+            os.makedirs(path.dirname(config_path), exist_ok=True)
     else:
         config_path = path.abspath(path.join(path.dirname(__file__), "../../config.toml"))
+
+    # 读取或创建配置文件
     if not path.exists(config_path):
         debug("Config file not found, using default config.")
+        debug(f"Writing default config to file: {config_path}")
         try:
             with open(config_path, "w+", encoding="utf-8") as f:
                 toml.dump(Config.default().to_dict(), f)
+            if __is_macos_appbundle__:
+                raise FirstTimeRunMacOSAppError
             return Config.default()
         except IOError:
             msgbox(f"配置文件 {config_path} 不可写入，请调整权限后重试。")
+        except FirstTimeRunMacOSAppError:
+            msgbox(f"您似乎是首次在 macOS 上运行本游戏，由于 Apple 对应用程序完整性的检查，"
+                   f"游戏配置文件已保存在 {config_path}。"
+                   f"此通知不是错误，仅在您首次运行游戏时显示一次。")
     else:
         debug(f"Loading config from file: {config_path}")
         try:
