@@ -1,0 +1,84 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+      - uses: pdm-project/setup-pdm@v3
+        name: Setup PDM
+        with:
+          python-version: 3.11
+          architecture: x64
+          update-python: false
+      - name: Install dependencies
+        run: pdm install
+      - name: Build
+        run: pdm run build
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.os }}
+          path: dist
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Artifact (windows-amd64)
+        uses: actions/download-artifact@v3
+        with:
+          name: build-windows-latest
+          path: build-windows-latest
+      - name: Download Artifact (macos-amd64)
+        uses: actions/download-artifact@v3
+        with:
+          name: build-macos-latest
+          path: build-macos-latest
+      - name: Download Artifact (linux-amd64)
+        uses: actions/download-artifact@v3
+        with:
+          name: build-ubuntu-latest
+          path: build-ubuntu-latest
+      - name: Setup release names
+        run: |
+          mv build-windows-latest/tygame.exe tygame-${{ github.ref_name }}-windows-amd64.exe          
+          mv build-ubuntu-latest/tygame      tygame-${{ github.ref_name }}-linux-amd64
+          mv build-macos-latest/tygame       tygame-${{ github.ref_name }}-darwin-amd64
+          mv build-macos-latest/TYGame.app   TYGame.app
+          chmod +x TYGame.app/Contents/MacOS/tygame
+          zip -r tygame-${{ github.ref_name }}-macos-amd64.zip TYGame.app
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            tygame-${{ github.ref_name }}-windows-amd64.exe
+            tygame-${{ github.ref_name }}-macos-amd64.zip
+            tygame-${{ github.ref_name }}-darwin-amd64
+            tygame-${{ github.ref_name }}-linux-amd64

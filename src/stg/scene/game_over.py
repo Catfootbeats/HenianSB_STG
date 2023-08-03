@@ -1,9 +1,9 @@
 import os
+from stg.components.text import Text
+from stg.components.board import XLBBoard
+from stg import __resource_path__
 
-from text import Text
-from xlb_board import XLBBoard
-
-FONT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts/curely.ttf')
+FONT_PATH = os.path.join(__resource_path__, 'fonts/Curely.ttf')
 
 
 class GameOver:

@@ -1,4 +1,7 @@
-class Settings:
+from dataclasses import dataclass
+
+@dataclass
+class Config:
     def __init__(self):
 
         # General Settings 基础设定

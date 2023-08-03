@@ -1,25 +1,22 @@
-import os.path
-import random
+import os
 import sys
-from shutil import copyfile
-
+import shutil
+import random
 import pygame
-import webbrowser
+import platform
 
-import config_loader
-import menu_scene
-import text
-import tools
-from game_over_scene import GameOver
-from menu_scene import Menu
-from settings import Settings
-from ship import Ship
-from enemy import Enemy
-from xlb_board import XLBBoard
+import stg.scene.menu as menu
+import stg.components.text as text
+from stg.scene.game_over import GameOver
+from stg.scene.menu import Menu
+from stg.settings import Settings
+from stg.sprites.player import Player
+from stg.sprites.enemy import Enemy
+from stg.components.board import XLBBoard
+from stg import debug, __resource_path__, __version__
 
-# from self_bullet import SelfBullet
 
-ICO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'images/tysm.ico')
+ICO_PATH = os.path.join(__resource_path__, "images/tysm.ico")
 GAME_STATE_MENU = 0
 GAME_STATE_GAMING = 1
 GAME_STATE_GAME_OVER = 2
@@ -99,7 +96,7 @@ class TY:
 
     def _init_game(self):
         self.xiao_long_bao = 0
-        self.ship = Ship(self)
+        self.ship = Player(self)
         self.self_bullets = pygame.sprite.Group()
         self.enemy_bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
@@ -158,20 +155,21 @@ class TY:
                 mouse_pos = pygame.mouse.get_pos()
                 # tools.debug(menu_sign)
                 if self.menu.play_button.rect.collidepoint(
-                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                        mouse_pos) and self.menu.state == menu.MENU_STATE_NORMAL:
                     self.game_state = GAME_STATE_GAMING
                 if self.menu.help_button.rect.collidepoint(
-                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
+                        mouse_pos) and self.menu.state == menu.MENU_STATE_NORMAL:
                     # print(self.menu.state)
-                    self.menu.state = menu_scene.MENU_STATE_HELP
+                    self.menu.state = menu.MENU_STATE_HELP
                     menu_sign = 2
                 if self.menu.about_button.rect.collidepoint(
-                        mouse_pos) and self.menu.state == menu_scene.MENU_STATE_NORMAL:
-                    webbrowser.open('github.com/Catfootbeats/HenianSB_STG')
-                    self.menu.state = menu_scene.MENU_STATE_ABOUT
+                        mouse_pos) and self.menu.state == menu.MENU_STATE_NORMAL:
+                    # 开你妹的浏览器啊 烦死了 你还是把这个加到关于页的 GitHub 链接里去
+                    # webbrowser.open('https://github.com/Catfootbeats/HenianSB_STG')
+                    self.menu.state = menu.MENU_STATE_ABOUT
                     menu_sign = 2
-                if self.menu.state != menu_scene.MENU_STATE_NORMAL and menu_sign == 1:
-                    self.menu.state = menu_scene.MENU_STATE_NORMAL
+                if self.menu.state != menu.MENU_STATE_NORMAL and menu_sign == 1:
+                    self.menu.state = menu.MENU_STATE_NORMAL
                     self.menu_sign = 0
 
     def _check_events(self):
@@ -311,7 +309,7 @@ class TY:
                                                                                                     self.enemy_bullets,
                                                                                                     False,
                                                                                                     pygame.sprite.collide_circle):
-            tools.debug('GAME OVER!!!')
+            debug('GAME OVER!!!')
             self.game_state = GAME_STATE_GAME_OVER
             self.create_enemy_count = 0
             self.game_is_init = False
@@ -337,7 +335,7 @@ class TY:
                 # debug.debug(enemy.health)
                 if enemy.hurt():
                     self.xiao_long_bao += enemy.xiao_long_bao
-                    tools.debug(self.xiao_long_bao)
+                    debug(self.xiao_long_bao)
                     self.enemies.remove(enemy)
 
     def _draw_bullets(self):
@@ -357,5 +355,9 @@ class TY:
 
 
 if __name__ == '__main__':
+    debug(f"beating-agent-v-stg version {__version__} (python package: {__package__})")
+    debug(f"Python {platform.python_version()} {platform.python_build()}")
+    debug(f"Platform: {platform.system()}/{platform.release()}")
+    debug(f"Command line: {sys.argv}")
     th = TY()
     th.run_game()
