@@ -15,8 +15,8 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.game = ty_game
         self.screen = ty_game.screen
-        self.settings = ty_game.settings
-        self.radius = self.settings.ship_hitbox_r
+        self.config = ty_game.config
+        self.radius = self.config.player_hitbox_r
         self.screen_rect = ty_game.screen.get_rect()
 
         # Get surface
@@ -38,20 +38,20 @@ class Player(pygame.sprite.Sprite):
         self.moving_up = False
         self.moving_down = False
         self.shift = False
-        self.act_speed = self.settings.ship_speed
+        self.act_speed = self.config.player_speed
 
         # Fire sign
         self.is_fire = False
-        self.fire_delay = self.settings.self_bullet_delay
+        self.fire_delay = self.config.player_bullet_delay
         self.fire_delay_sign = 0
 
     def update(self):
         if self.shift:
-            self.act_speed = self.settings.ship_low_speed
+            self.act_speed = self.config.player_low_speed
             # TODO exchange image
             self.image = pygame.image.load(PLAYER_WITH_POINT_IMAGE_PATH)
         else:
-            self.act_speed = self.settings.ship_speed
+            self.act_speed = self.config.player_speed
             # TODO exchange image
             self.image = pygame.image.load(PLAYER_IMAGE_PATH)
 
@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
         if self.fire_delay_sign == 0:
             if self.is_fire:
                 new_bullet = PlayerBullet(self.game)
-                self.game.self_bullets.add(new_bullet)
+                self.game.player_bullets.add(new_bullet)
             self.fire_delay_sign += 1
         elif self.fire_delay_sign == self.fire_delay:
             self.fire_delay_sign = 0

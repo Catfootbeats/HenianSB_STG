@@ -1,61 +1,174 @@
 from dataclasses import dataclass
 
+
+@dataclass
+class GeneralConfig:
+    screen_width: int
+    screen_height: int
+    bg_color: str
+    is_full_screen: bool
+    fps: int
+
+
+@dataclass
+class PlayerConfig:
+    speed: int
+    low_speed: int
+    hitbox_r: int
+
+
+@dataclass
+class PlayerBulletConfig:
+    delay: int
+    speed: int
+    width: int
+    height: int
+
+
+@dataclass
+class EnemyConfig:
+    health: int
+    score: int
+
+
+@dataclass
+class EnemyBulletConfig:
+    delay: int
+    speed: int
+
+
+@dataclass
+class BossConfig:
+    health: int
+    score: int
+
+
+@dataclass
+class BossBulletConfig:
+    delay: int
+
+
+@dataclass
+class LevelConfig:
+    create_enemy_delay: int
+    create_sleep: int
+    create_max: int
+    screen_enemy_max: int
+
+
 @dataclass
 class Config:
-    def __init__(self):
+    general: GeneralConfig
+    player: PlayerConfig
+    enemy: EnemyConfig
+    boss: BossConfig
+    player_bullet: PlayerBulletConfig
+    enemy_bullet: EnemyBulletConfig
+    boss_bullet: BossBulletConfig
+    level: LevelConfig
 
-        # General Settings 基础设定
-        # 屏幕宽高
-        self.screen_width = 1280
-        self.screen_height = 768
-        # 背景颜色
-        self.bg_color = '#66ccff'
-        # 是否全屏
-        self.is_full_screen = False
-        # 帧率(改变会影响一切速度)
-        self.FPS = 60
-        # If FPS = 0, no limitation
 
-        # Ship Settings 自机设定
-        # 速度
-        self.ship_speed = 9
-        # Shift速度
-        self.ship_low_speed = 3
-        # 判定点半径
-        self.ship_hitbox_r = 5
+    def __post_init__(self):
+        for section_name, section_init in self.sections():
+            section = self.__dict__[section_name]
+            for key, value in section.__dict__.items():
+                self.__dict__[f"{section_name}_{key}"] = value
 
-        # Bullet Settings 子弹设定
-        # 自机子弹发射延迟
-        self.self_bullet_delay = 2
-        # 自机子弹速度
-        self.self_bullet_speed = 15
-        # 自机子弹宽高
-        self.self_bullet_width = 10
-        self.self_bullet_height = 10
-        # 敌机子弹速度
-        self.enemy_bullet_speed = 10
-        # 敌机子弹发射延迟
-        self.enemy_bullet_delay = 1
-        # 打败敌机获得分数(小笼包)
-        self.enemy_xlb = 1000
-        # 为什么干掉小兵获得的小笼包比BOSS还多？
 
-        # 创建敌机延迟(间隔)
-        self.create_enemy_delay = 100
-        # 每轮休息时间长度
-        self.create_sleep = 500
-        # 每轮最大敌机数
-        self.create_max = 10
-        # 单屏最大敌机数
-        self.screen_enemy_max = 10
+    @staticmethod
+    def sections() -> list[tuple[str, callable]]:
+        return [(k, v) for k, v in Config.__annotations__.items() if v.__name__.endswith("Config")]
+    
 
-        # Boss(旋转发弹幕的敌机)子弹延迟
-        self.boss_bullet_delay = 100
-        # 打败Boss得分(小笼包)
-        self.boss_xlb = 100
+    @staticmethod
+    def non_sections() -> list[str]:
+        return [k for k, v in Config.__annotations__.items() if not v.__name__.endswith("Config")]
 
-        # Enemy Settings 敌机设定
-        # 敌机血量
-        self.enemy_health = 1
-        # Boss血量
-        self.boss_health = 1
+
+    @staticmethod
+    def default() -> 'Config':
+           return Config(
+                general=GeneralConfig(
+                    screen_width=1280,
+                    screen_height=768,
+                    bg_color='#66ccff',
+                    is_full_screen=False,
+                    fps=60
+                ),
+                player=PlayerConfig(
+                    speed=9,
+                    low_speed=3,
+                    hitbox_r=5
+                ),
+                player_bullet=PlayerBulletConfig(
+                    delay=2,
+                    speed=15,
+                    width=10,
+                    height=10,
+                ),
+                enemy=EnemyConfig(
+                    health=1,
+                    score=1000,
+                ),
+                enemy_bullet=EnemyBulletConfig(
+                    delay=1,
+                    speed=15,
+                ),
+                boss=BossConfig(
+                    health=1,
+                    score=100,
+                ),
+                boss_bullet=BossBulletConfig(
+                    delay=100,
+                ),
+                level=LevelConfig(
+                    create_enemy_delay=100,
+                    create_sleep=500,
+                    create_max=10,
+                    screen_enemy_max=10,
+                )
+            )
+
+
+    @staticmethod
+    def from_dict(config_dict: dict) -> 'Config':
+        for section_name, section_init in Config.sections():
+            config_dict[section_name] = section_init(**config_dict[section_name])
+        return Config(**config_dict)
+    
+
+    def to_dict(self) -> dict:
+        result = {}
+        for section_name, section_init in self.sections():
+            result[section_name] = self.__dict__[section_name].__dict__
+        for field in self.non_sections():
+            result[field] = self.__dict__[field]
+        return result
+
+
+def load_config() -> Config:
+    import sys
+    import toml
+    from os import path
+    from stg import __is_pyinstaller__, debug, msgbox
+    if __is_pyinstaller__:
+        config_path = path.abspath(path.join(path.dirname(sys.executable), "config.toml"))
+    else:
+        config_path = path.abspath(path.join(path.dirname(__file__), "../../config.toml"))
+    if not path.exists(config_path):
+        debug("Config file not found, using default config.")
+        try:
+            with open(config_path, "w+", encoding="utf-8") as f:
+                toml.dump(Config.default().to_dict(), f)
+            return Config.default()
+        except IOError:
+            msgbox(f"配置文件 {config_path} 不可写入，请调整权限后重试。")
+    else:
+        debug(f"Loading config from file: {config_path}")
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                return Config.from_dict(toml.load(f))
+        except IOError:
+            msgbox(f"配置文件 {config_path} 不可读取，请调整权限后重试。")
+        except toml.TomlDecodeError:
+            msgbox(f"配置文件 {config_path} 格式错误，请检查后重试。")

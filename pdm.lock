@@ -6,7 +6,7 @@ groups = ["default"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:bac4890e4d9c8e246c7c267a3cd1a185748ecf3ba0fbf6f68ad4b3cafa0dd686"
+content_hash = "sha256:bb62944b59bb7050ec98a7d4ad1956ca80682ae5d432c6d4b2e2be46f59b2e5c"
 
 [[package]]
 name = "altgraph"
@@ -15,14 +15,6 @@ summary = "Python graph (network) package"
 files = [
     {file = "altgraph-0.17.3-py2.py3-none-any.whl", hash = "sha256:c8ac1ca6772207179ed8003ce7687757c04b0b71536f81e2ac5755c6226458fe"},
     {file = "altgraph-0.17.3.tar.gz", hash = "sha256:ad33358114df7c9416cdb8fa1eaa5852166c505118717021c6a8c7c7abbd03dd"},
-]
-
-[[package]]
-name = "mac-appify"
-version = "2020.12.3"
-summary = ""
-files = [
-    {file = "mac-appify-2020.12.3.tar.gz", hash = "sha256:14864816910ad2aa36c83ce7eb8a39d28fc3b7d43305bc6f209f4f8887171527"},
 ]
 
 [[package]]

@@ -8,6 +8,7 @@ Pipfile.lock
 /dist/
 /__pycache__/
 /config.ini
+/config.toml
 .DS_Store
 
 # Byte-compiled / optimized / DLL files

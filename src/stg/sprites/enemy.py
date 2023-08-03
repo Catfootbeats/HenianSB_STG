@@ -15,15 +15,15 @@ class Enemy(Sprite):
 
     def __init__(self, ty_game, x: int, y: int, enter_speed: int = 3, is_boss: bool = False):
         super().__init__()
-        self.health = ty_game.settings.enemy_health
-        self.fire_delay = ty_game.settings.enemy_bullet_delay
-        self.xiao_long_bao = ty_game.settings.enemy_xlb
+        self.health = ty_game.config.enemy_health
+        self.fire_delay = ty_game.config.enemy_bullet_delay
+        self.score = ty_game.config.enemy_score
         if is_boss:
-            self.xiao_long_bao = ty_game.settings.boss_xlb
-            self.health = ty_game.settings.boss_health
-            self.fire_delay = ty_game.settings.boss_bullet_delay
+            self.score = ty_game.config.boss_score
+            self.health = ty_game.config.boss_health
+            self.fire_delay = ty_game.config.boss_bullet_delay
         self.screen = ty_game.screen
-        self.settings = ty_game.settings
+        self.config = ty_game.config
         self.game = ty_game
         self.image = pygame.image.load(ENEMY_IMAGE_PATH)
         self.rect = self.image.get_rect()
@@ -83,7 +83,7 @@ class Enemy(Sprite):
         if self.fire_delay_sign == 0:
             bullet_move_direction = get_player_direction(self, player_x, player_y)
             # print('Position:', '(', self.x, ',', self.y, ')', ':', bullet_move_direction)
-            bullet = EnemyBullet(self.screen, self.settings, bullet_move_direction, self)
+            bullet = EnemyBullet(self.screen, self.config, bullet_move_direction, self)
             self.game.enemy_bullets.add(bullet)
             self.fire_delay_sign += 1
         elif self.fire_delay_sign == self.fire_delay:
@@ -93,7 +93,7 @@ class Enemy(Sprite):
 
     def _fire_angle(self, direction: float):
         if self.fire_delay_sign == 0:
-            bullet = EnemyBullet(self.screen, self.settings, direction, self)
+            bullet = EnemyBullet(self.screen, self.config, direction, self)
             self.game.enemy_bullets.add(bullet)
             self.fire_delay_sign += 1
         elif self.fire_delay_sign == self.fire_delay:
