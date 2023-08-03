@@ -13,6 +13,7 @@ a = Analysis(
     datas=[
     ('images', '.\\images'),
     ('fonts', '.\\fonts'),
+    ('config_example.ini', '.\\'),
     ],
     hiddenimports=[],
     hookspath=[],
