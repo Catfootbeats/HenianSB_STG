@@ -1,6 +1,6 @@
 [project]
 name = "beating-agent-v-stg"
-version = "0.3.1"
+version = "0.3.2"
 description = "天依的一款弹幕设计游戏，使用Python和Pygame开发天依的一款弹幕设计游戏，使用Python和Pygame开发"
 authors = [
     {name = "Catfootbeats (某某)"},
